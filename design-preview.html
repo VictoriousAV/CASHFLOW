@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CashFlow AI — Design System Preview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  :root{
+    --primary:#00C853; --primary-dark:#009624; --mint:#D4FF00; --bg:#FFFFFF;
+    --card:#FFFFFF; --text:#000000; --muted:#333333; --border:#000000;
+    --warning:#FF8F00; --danger:#E60000; --info:#0057FF; --radius:16px;
+  }
+  *{box-sizing:border-box} body{margin:0;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text)}
+  .wrap{max-width:1000px;margin:0 auto;padding:32px 20px 60px}
+  .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .logo{display:flex;align-items:center;gap:12px}
+  .mark{width:44px;height:44px;border-radius:12px;background:var(--primary);color:#000;border:2px solid #000;display:grid;place-items:center;font-weight:800;font-size:22px}
+  h1{font-size:28px;margin:0;letter-spacing:-.02em} .tag{color:var(--muted);margin:4px 0 24px;font-size:15px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px} @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:4px 4px 0 #000}
+  .card h2{font-size:18px;margin:0 0 4px} .card p.sub{margin:0 0 16px;color:var(--muted);font-size:13px}
+  .swatches{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .sw{border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#fff}
+  .sw .c{height:64px} .sw .t{padding:8px 10px;font-size:12px} .sw .t b{display:block;font-size:13px}
+  .type-sample h1{font-size:32px;margin:8px 0} .type-sample h2{font-size:20px;margin:8px 0}
+  .fig{font-size:32px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:2px solid #000;border-radius:12px;padding:12px 18px;font-weight:800;font-size:14px;cursor:pointer;margin:6px 8px 6px 0;box-shadow:3px 3px 0 #000}
+  .btn-primary{background:var(--primary);color:#000} .btn-primary:hover{background:var(--mint)}
+  .btn-secondary{background:var(--mint);color:#000} .btn-ghost{background:#fff;border:2px solid #000;color:#000}
+  .btn-danger{background:var(--danger);color:#fff} .btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+  label{font-size:13px;font-weight:600;display:block;margin:12px 0 6px}
+  input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:2px solid #000;font-size:14px;font-weight:600;font-family:inherit;background:#fff;color:#000}
+  input:focus,select:focus{outline:3px solid var(--mint);border-color:#000;background:#FFFDE7}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .metric{background:var(--card);border:2px solid #000;border-radius:var(--radius);padding:16px}
+  .metric span{font-size:12px;color:#000;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+  .metric .v{font-size:28px;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums}
+  .forecast{background:var(--primary);color:#000;border:2px solid #000;border-radius:var(--radius);padding:18px 20px;box-shadow:4px 4px 0 #000}
+  .forecast small{opacity:1;font-weight:700} .ai{background:#E3F2FF;border:2px solid #000;border-radius:var(--radius);padding:16px 18px}
+  .pill{display:inline-block;font-size:12px;font-weight:700;background:#FEF3C7;color:#92400E;border-radius:999px;padding:4px 10px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="logo"><div class="mark">₦</div><div><h1>CashFlow AI</h1><div style="color:var(--muted);font-size:13px">Know where your money goes. Know how long it will last.</div></div></div>
+    <div style="font-size:12px;color:var(--muted)">Design System v0.1 • Streamlit theme match</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>1. Colors — Bright / High Contrast</h2><p class="sub">Vivid green + electric lime on pure white/black for sharp contrast</p>
+      <div class="swatches">
+        <div class="sw"><div class="c" style="background:#00C853"></div><div class="t"><b>Primary</b>#00C853 vivid green</div></div>
+        <div class="sw"><div class="c" style="background:#D4FF00"></div><div class="t"><b>Secondary</b>#D4FF00 electric lime</div></div>
+        <div class="sw"><div class="c" style="background:#FFFFFF;border-bottom:2px solid #000"></div><div class="t"><b>Background</b>#FFFFFF white</div></div>
+        <div class="sw"><div class="c" style="background:#000000"></div><div class="t"><b>Text</b>#000000 black</div></div>
+        <div class="sw"><div class="c" style="background:#FF8F00"></div><div class="t"><b>Warning</b>#FF8F00 bright orange</div></div>
+        <div class="sw"><div class="c" style="background:#E60000"></div><div class="t"><b>Danger</b>#E60000 bright red</div></div>
+      </div>
+    </div>
+
+    <div class="card type-sample">
+      <h2>2. Typography — Inter</h2><p class="sub">H1 28 bold / H2 20 / Body 15 / Figures 32 tabular</p>
+      <h1>Good morning, Daniel 👋</h1>
+      <h2>Your current balance</h2>
+      <div class="fig">₦48,500</div>
+      <p style="color:var(--muted)">Food is currently your largest spending category. Your food spending increased compared with last week.</p>
+    </div>
+
+    <div class="card">
+      <h2>3. Buttons</h2><p class="sub">12px radius, 12×18 padding, hover darken</p>
+      <button class="btn btn-primary">+ Add Expense</button>
+      <button class="btn btn-secondary">Upload CSV</button>
+      <button class="btn btn-ghost">Cancel</button>
+      <button class="btn btn-danger">Delete</button>
+      <button class="btn btn-primary" disabled>Disabled</button>
+      <div style="margin-top:12px;font-size:12px;color:var(--muted)">Streamlit mapping: primary → green, secondary → mint, ghost → st.button default</div>
+    </div>
+
+    <div class="card">
+      <h2>4. Sample Inputs</h2><p class="sub">Add Transaction form • focus = mint ring + green border</p>
+      <label>Description</label><input value="Chicken Republic" />
+      <div class="row"><div><label>Amount (₦)</label><input value="4,500" /></div><div><label>Type</label><select><option>Expense</option><option>Income</option></select></div></div>
+      <div class="row"><div><label>Category</label><select><option>Food</option><option>Transport</option><option>Data & Airtime</option></select></div><div><label>Date</label><input value="2026-09-20" /></div></div>
+      <label>Note (optional)</label><input placeholder="e.g. lunch with friends" />
+    </div>
+
+    <div class="card">
+      <h2>5. Cards in use</h2><p class="sub">Metric • Forecast • AI Insight</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">
+        <div class="metric"><span>Income</span><div class="v">₦70k</div></div>
+        <div class="metric"><span>Expenses</span><div class="v">₦21.5k</div></div>
+        <div class="metric"><span>Savings</span><div class="v">₦10k</div></div>
+      </div>
+      <div class="forecast"><small>ESTIMATED REMAINING</small><div style="font-size:26px;font-weight:800">~17 days</div><small>₦48,500 ÷ ₦2,800/day • estimate, not guarantee</small></div>
+      <div style="height:10px"></div>
+      <div class="ai">🤖 <b>AI Insight</b><br/>Food is your largest category. Spending up 18% vs last week.<br/><span class="pill">⚠️ 85% of food budget used</span></div>
+    </div>
+
+    <div class="card">
+      <h2>6. Streamlit tokens</h2><p class="sub">Copy to .streamlit/config.toml</p>
+<pre style="background:#000;color:#D4FF00;padding:14px;border-radius:12px;border:2px solid #000;font-size:12px;overflow:auto">[theme]
+primaryColor="#00C853"
+backgroundColor="#FFFFFF"
+secondaryBackgroundColor="#D4FF00"
+textColor="#000000"
+font="sans serif"</pre>
+    </div>
+  </div>
+</div>
+</body>
+</html>
