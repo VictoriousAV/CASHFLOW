@@ -3,112 +3,212 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CashFlow AI — Design System Preview</title>
+<title>CashFlow AI — Working Prototype (Phase 0+1)</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-  :root{
-    --primary:#00C853; --primary-dark:#009624; --mint:#D4FF00; --bg:#FFFFFF;
-    --card:#FFFFFF; --text:#000000; --muted:#333333; --border:#000000;
-    --warning:#FF8F00; --danger:#E60000; --info:#0057FF; --radius:16px;
-  }
-  *{box-sizing:border-box} body{margin:0;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text)}
-  .wrap{max-width:1000px;margin:0 auto;padding:32px 20px 60px}
-  .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-  .logo{display:flex;align-items:center;gap:12px}
-  .mark{width:44px;height:44px;border-radius:12px;background:var(--primary);color:#000;border:2px solid #000;display:grid;place-items:center;font-weight:800;font-size:22px}
-  h1{font-size:28px;margin:0;letter-spacing:-.02em} .tag{color:var(--muted);margin:4px 0 24px;font-size:15px}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px} @media(max-width:760px){.grid{grid-template-columns:1fr}}
-  .card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:4px 4px 0 #000}
-  .card h2{font-size:18px;margin:0 0 4px} .card p.sub{margin:0 0 16px;color:var(--muted);font-size:13px}
-  .swatches{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  .sw{border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#fff}
-  .sw .c{height:64px} .sw .t{padding:8px 10px;font-size:12px} .sw .t b{display:block;font-size:13px}
-  .type-sample h1{font-size:32px;margin:8px 0} .type-sample h2{font-size:20px;margin:8px 0}
-  .fig{font-size:32px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:2px solid #000;border-radius:12px;padding:12px 18px;font-weight:800;font-size:14px;cursor:pointer;margin:6px 8px 6px 0;box-shadow:3px 3px 0 #000}
-  .btn-primary{background:var(--primary);color:#000} .btn-primary:hover{background:var(--mint)}
-  .btn-secondary{background:var(--mint);color:#000} .btn-ghost{background:#fff;border:2px solid #000;color:#000}
-  .btn-danger{background:var(--danger);color:#fff} .btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
-  label{font-size:13px;font-weight:600;display:block;margin:12px 0 6px}
-  input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:2px solid #000;font-size:14px;font-weight:600;font-family:inherit;background:#fff;color:#000}
-  input:focus,select:focus{outline:3px solid var(--mint);border-color:#000;background:#FFFDE7}
-  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .metric{background:var(--card);border:2px solid #000;border-radius:var(--radius);padding:16px}
-  .metric span{font-size:12px;color:#000;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
-  .metric .v{font-size:28px;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums}
-  .forecast{background:var(--primary);color:#000;border:2px solid #000;border-radius:var(--radius);padding:18px 20px;box-shadow:4px 4px 0 #000}
-  .forecast small{opacity:1;font-weight:700} .ai{background:#E3F2FF;border:2px solid #000;border-radius:var(--radius);padding:16px 18px}
-  .pill{display:inline-block;font-size:12px;font-weight:700;background:#FEF3C7;color:#92400E;border-radius:999px;padding:4px 10px;margin-top:8px}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+  :root{--primary:#00C853;--lime:#D4FF00;--bg:#fff;--text:#000;--muted:#333;
+    --warn:#FF8F00;--danger:#E60000;--info:#0057FF;--r:16px}
+  *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text)}
+  header{position:sticky;top:0;background:#000;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px;z-index:10;flex-wrap:wrap}
+  .mark{width:40px;height:40px;border-radius:10px;background:var(--primary);color:#000;border:2px solid #fff;display:grid;place-items:center;font-weight:800;font-size:20px}
+  nav{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+  nav button{background:#fff;color:#000;border:2px solid #fff;border-radius:10px;padding:8px 12px;font-weight:800;cursor:pointer}
+  nav button.active{background:var(--lime)}
+  .wrap{max-width:1080px;margin:0 auto;padding:20px}
+  .card{background:#fff;border:2px solid #000;border-radius:var(--r);padding:18px;box-shadow:4px 4px 0 #000;margin-bottom:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:760px){.grid3,.grid2{grid-template-columns:1fr}}
+  .metric span{font-size:11px;font-weight:800;letter-spacing:.06em}.metric .v{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}
+  .forecast{background:var(--primary);border:2px solid #000;border-radius:var(--r);padding:16px;box-shadow:4px 4px 0 #000}
+  .ai{background:#E3F2FF;border:2px solid #000;border-radius:var(--r);padding:14px}
+  .btn{border:2px solid #000;border-radius:12px;padding:10px 16px;font-weight:800;cursor:pointer;box-shadow:3px 3px 0 #000;background:var(--primary)}
+  .btn.sec{background:var(--lime)}.btn.ghost{background:#fff;box-shadow:none}.btn.danger{background:var(--danger);color:#fff}
+  label{font-size:12px;font-weight:800;display:block;margin:10px 0 4px}
+  input,select{width:100%;padding:10px 12px;border:2px solid #000;border-radius:10px;font-weight:600;font-family:inherit}
+  input:focus,select:focus{outline:3px solid var(--lime);background:#FFFDE7}
+  table{width:100%;border-collapse:collapse;font-size:14px}th,td{border:2px solid #000;padding:8px;text-align:left}th{background:#000;color:#fff}
+  .bar{height:14px;background:var(--primary);border:2px solid #000;border-radius:6px}
+  .prog{height:18px;border:2px solid #000;border-radius:9px;background:#eee;overflow:hidden}.prog>div{height:100%;background:var(--primary)}
+  .pill{display:inline-block;background:#FEF3C7;border:2px solid #000;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:800}
+  .tab{display:none}.tab.active{display:block}
+  .chat{background:#f7f7f7;border:2px solid #000;border-radius:12px;padding:10px;min-height:120px;margin:10px 0}
+  .tokens{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;font-weight:800}
+  .tok{border:2px solid #000;border-radius:8px;padding:6px 10px}
 </style>
 </head>
 <body>
+<header>
+  <div class="mark">₦</div>
+  <div><b>CashFlow AI</b><br><small>Phase 0+1 working prototype • bright theme</small></div>
+  <nav id="nav">
+    <button data-t="dash" class="active">Dashboard</button>
+    <button data-t="txns">Transactions</button>
+    <button data-t="budget">Budget</button>
+    <button data-t="goals">Savings Goals</button>
+    <button data-t="forecast">Forecast</button>
+    <button data-t="coach">AI Coach</button>
+    <button data-t="profile">Profile</button>
+  </nav>
+</header>
 <div class="wrap">
-  <div class="header">
-    <div class="logo"><div class="mark">₦</div><div><h1>CashFlow AI</h1><div style="color:var(--muted);font-size:13px">Know where your money goes. Know how long it will last.</div></div></div>
-    <div style="font-size:12px;color:var(--muted)">Design System v0.1 • Streamlit theme match</div>
-  </div>
 
-  <div class="grid">
-    <div class="card">
-      <h2>1. Colors — Bright / High Contrast</h2><p class="sub">Vivid green + electric lime on pure white/black for sharp contrast</p>
-      <div class="swatches">
-        <div class="sw"><div class="c" style="background:#00C853"></div><div class="t"><b>Primary</b>#00C853 vivid green</div></div>
-        <div class="sw"><div class="c" style="background:#D4FF00"></div><div class="t"><b>Secondary</b>#D4FF00 electric lime</div></div>
-        <div class="sw"><div class="c" style="background:#FFFFFF;border-bottom:2px solid #000"></div><div class="t"><b>Background</b>#FFFFFF white</div></div>
-        <div class="sw"><div class="c" style="background:#000000"></div><div class="t"><b>Text</b>#000000 black</div></div>
-        <div class="sw"><div class="c" style="background:#FF8F00"></div><div class="t"><b>Warning</b>#FF8F00 bright orange</div></div>
-        <div class="sw"><div class="c" style="background:#E60000"></div><div class="t"><b>Danger</b>#E60000 bright red</div></div>
+  <section id="dash" class="tab active">
+    <div class="card"><h2 style="margin:0">Good morning, Daniel 👋</h2><div id="balBig" style="font-size:36px;font-weight:800">₦0</div>
+      <div class="tokens" style="margin-top:8px">
+        <span class="tok" style="background:#00C853">#00C853 primary</span>
+        <span class="tok" style="background:#D4FF00">#D4FF00 lime</span>
+        <span class="tok" style="background:#fff">#FFFFFF bg</span>
+        <span class="tok" style="background:#000;color:#fff">#000000 text</span>
       </div>
     </div>
-
-    <div class="card type-sample">
-      <h2>2. Typography — Inter</h2><p class="sub">H1 28 bold / H2 20 / Body 15 / Figures 32 tabular</p>
-      <h1>Good morning, Daniel 👋</h1>
-      <h2>Your current balance</h2>
-      <div class="fig">₦48,500</div>
-      <p style="color:var(--muted)">Food is currently your largest spending category. Your food spending increased compared with last week.</p>
+    <div class="grid3">
+      <div class="card metric"><span>INCOME</span><div class="v" id="mInc">₦0</div><small>This month</small></div>
+      <div class="card metric"><span>EXPENSES</span><div class="v" id="mExp">₦0</div><small id="mAvg">avg —</small></div>
+      <div class="card metric"><span>SAVINGS</span><div class="v">₦10,000</div><small>Tracked</small></div>
     </div>
+    <div class="forecast"><small><b>ESTIMATED REMAINING</b></small><div id="daysLeft" style="font-size:28px;font-weight:800">—</div><small id="forecastSub"><b>estimate, not guarantee</b></small></div>
+    <div style="height:12px"></div>
+    <div class="ai">🤖 <b>AI Insight</b><div id="insight"></div><div style="margin-top:6px"><span class="pill" id="budgetPill"></span></div></div>
+    <div style="height:12px"></div>
+    <div class="card"><b>Spending by category</b><div id="catBars"></div></div>
+  </section>
 
-    <div class="card">
-      <h2>3. Buttons</h2><p class="sub">12px radius, 12×18 padding, hover darken</p>
-      <button class="btn btn-primary">+ Add Expense</button>
-      <button class="btn btn-secondary">Upload CSV</button>
-      <button class="btn btn-ghost">Cancel</button>
-      <button class="btn btn-danger">Delete</button>
-      <button class="btn btn-primary" disabled>Disabled</button>
-      <div style="margin-top:12px;font-size:12px;color:var(--muted)">Streamlit mapping: primary → green, secondary → mint, ghost → st.button default</div>
-    </div>
-
-    <div class="card">
-      <h2>4. Sample Inputs</h2><p class="sub">Add Transaction form • focus = mint ring + green border</p>
-      <label>Description</label><input value="Chicken Republic" />
-      <div class="row"><div><label>Amount (₦)</label><input value="4,500" /></div><div><label>Type</label><select><option>Expense</option><option>Income</option></select></div></div>
-      <div class="row"><div><label>Category</label><select><option>Food</option><option>Transport</option><option>Data & Airtime</option></select></div><div><label>Date</label><input value="2026-09-20" /></div></div>
-      <label>Note (optional)</label><input placeholder="e.g. lunch with friends" />
-    </div>
-
-    <div class="card">
-      <h2>5. Cards in use</h2><p class="sub">Metric • Forecast • AI Insight</p>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">
-        <div class="metric"><span>Income</span><div class="v">₦70k</div></div>
-        <div class="metric"><span>Expenses</span><div class="v">₦21.5k</div></div>
-        <div class="metric"><span>Savings</span><div class="v">₦10k</div></div>
+  <section id="txns" class="tab">
+    <div class="card"><b>Transactions</b>
+      <div style="display:flex;gap:8px;margin:10px 0;flex-wrap:wrap">
+        <input id="search" placeholder="Search…" style="max-width:220px">
+        <select id="fcat" style="max-width:200px"><option value="">All categories</option></select>
+        <label style="display:flex;gap:6px;align-items:center">CSV <input type="file" id="csv" accept=".csv" style="max-width:220px"></label>
       </div>
-      <div class="forecast"><small>ESTIMATED REMAINING</small><div style="font-size:26px;font-weight:800">~17 days</div><small>₦48,500 ÷ ₦2,800/day • estimate, not guarantee</small></div>
-      <div style="height:10px"></div>
-      <div class="ai">🤖 <b>AI Insight</b><br/>Food is your largest category. Spending up 18% vs last week.<br/><span class="pill">⚠️ 85% of food budget used</span></div>
+      <div style="overflow:auto"><table><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Type</th><th>Category</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
     </div>
+    <div class="card"><b>Add transaction</b>
+      <div class="grid2">
+        <div><label>Description</label><input id="d" value="Chicken Republic"></div>
+        <div><label>Amount (₦)</label><input id="a" type="number" value="4500"></div>
+        <div><label>Type</label><select id="t"><option>Expense</option><option>Income</option></select></div>
+        <div><label>Category (auto)</label><select id="c"></select></div>
+      </div>
+      <label>Date</label><input id="dt" type="date" value="2026-09-20">
+      <div style="margin-top:10px"><button class="btn" onclick="addTxn()">+ Add</button></div>
+    </div>
+  </section>
 
-    <div class="card">
-      <h2>6. Streamlit tokens</h2><p class="sub">Copy to .streamlit/config.toml</p>
-<pre style="background:#000;color:#D4FF00;padding:14px;border-radius:12px;border:2px solid #000;font-size:12px;overflow:auto">[theme]
-primaryColor="#00C853"
-backgroundColor="#FFFFFF"
-secondaryBackgroundColor="#D4FF00"
-textColor="#000000"
-font="sans serif"</pre>
+  <section id="budget" class="tab"><div class="card"><b>Budgets (monthly)</b><div id="budgets"></div></div></section>
+
+  <section id="goals" class="tab"><div class="card"><b>Savings goal</b>
+    <div>New Laptop — <b id="goalTxt">₦75,000 / ₦250,000 (30%)</b></div>
+    <div class="prog" style="margin:10px 0"><div id="goalBar" style="width:30%"></div></div>
+    <button class="btn sec" onclick="saveExtra()">+ Add ₦5,000 savings</button>
+  </div></section>
+
+  <section id="forecast" class="tab"><div class="card"><b>Balance forecast (estimate only)</b>
+    <div id="fmsg" style="margin:8px 0;font-weight:700"></div>
+    <svg id="chart" width="100%" height="160" style="border:2px solid #000;border-radius:12px;background:#fff"></svg>
+    <div id="ftable" style="margin-top:10px"></div>
+  </div></section>
+
+  <section id="coach" class="tab"><div class="card"><b>AI Coach (rule-based mock — Phase 8 will use LLM)</b>
+    <div class="chat" id="chat"><div>Ask me: “Can I afford ₦8,000 headphones?”</div></div>
+    <div style="display:flex;gap:8px"><input id="q" value="Can I afford ₦8,000 headphones?"><button class="btn" onclick="ask()">Ask</button></div>
+    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn ghost" onclick="quick('Where am I spending the most?')">Where most?</button>
+      <button class="btn ghost" onclick="quick('How to make ₦30,000 last 2 weeks?')">Make ₦30k last?</button>
     </div>
-  </div>
+  </div></section>
+
+  <section id="profile" class="tab"><div class="card"><b>Profile</b><div>Daniel • Student • Monthly income ₦70,000 • Next allowance Oct 1</div>
+    <div style="margin-top:8px"><button class="btn ghost" onclick="reset()">Reset demo data</button></div>
+  </div></section>
+
 </div>
+<script>
+const CATS=["Food","Transport","Data & Airtime","Education","Entertainment","Shopping","Bills","Savings","Health","Other"];
+const BUDGETS={Food:20000,Transport:10000,"Data & Airtime":5000,Entertainment:5000};
+let goal={saved:75000,target:250000};
+const SEED=[
+ {date:"2026-09-01",description:"Allowance",amount:70000,type:"income",category:"Other"},
+ {date:"2026-09-03",description:"Uber",amount:2500,type:"expense",category:"Transport"},
+ {date:"2026-09-04",description:"MTN Data",amount:2000,type:"expense",category:"Data & Airtime"},
+ {date:"2026-09-05",description:"Chicken Republic",amount:4500,type:"expense",category:"Food"},
+ {date:"2026-09-06",description:"Shoprite Food",amount:6000,type:"expense",category:"Food"},
+ {date:"2026-09-08",description:"Bolt Trip",amount:3000,type:"expense",category:"Transport"}];
+let txns=JSON.parse(localStorage.getItem("cf_txns")||"null")||SEED.slice();
+function save(){localStorage.setItem("cf_txns",JSON.stringify(txns))}
+function naira(n){return "₦"+Number(n||0).toLocaleString()}
+function cat(desc){desc=(desc||"").toLowerCase();
+ if(/mtn|glo|airtel|data|airtime/.test(desc))return "Data & Airtime";
+ if(/uber|bolt|keke|bus|transport/.test(desc))return "Transport";
+ if(/chicken|kfc|shoprite|food|republic/.test(desc))return "Food";
+ if(/school|tuition|education/.test(desc))return "Education";
+ if(/netflix|cinema|entertainment/.test(desc))return "Entertainment";
+ if(/bill|rent|nepa/.test(desc))return "Bills";return "Other"}
+function stats(){const inc=txns.filter(t=>t.type==="income").reduce((s,t)=>s+t.amount,0);
+ const exp=txns.filter(t=>t.type==="expense").reduce((s,t)=>s+t.amount,0);
+ const days=new Set(txns.filter(t=>t.type==="expense").map(t=>t.date)).size||1;
+ const avg=exp/days,bal=inc-exp,daysLeft=avg>0&&bal>0?Math.floor(bal/avg):null;
+ const totals={};txns.filter(t=>t.type==="expense").forEach(t=>totals[t.category]=(totals[t.category]||0)+t.amount);
+ return{inc,exp,avg,bal,daysLeft,totals}}
+function render(){const s=stats();
+ document.getElementById("balBig").textContent=naira(s.bal);
+ document.getElementById("mInc").textContent=naira(s.inc);
+ document.getElementById("mExp").textContent=naira(s.exp);
+ document.getElementById("mAvg").textContent="avg "+naira(Math.round(s.avg))+"/day";
+ document.getElementById("daysLeft").textContent=s.daysLeft==null?"—":"~"+s.daysLeft+" days";
+ document.getElementById("forecastSub").innerHTML="<b>"+naira(s.bal)+" ÷ "+naira(Math.round(s.avg))+"/day • estimate, not guarantee</b>";
+ const top=Object.entries(s.totals).sort((a,b)=>b[1]-a[1])[0];
+ document.getElementById("insight").textContent=top?top[0]+" is your largest expense ("+naira(top[1])+").":"Add expenses to unlock insights.";
+ const fu=(s.totals.Food||0)/BUDGETS.Food*100;
+ document.getElementById("budgetPill").textContent="⚠️ "+Math.round(fu)+"% of food budget used";
+ const max=Math.max(1,...Object.values(s.totals));
+ document.getElementById("catBars").innerHTML=Object.entries(s.totals).sort((a,b)=>b[1]-a[1]).map(([k,v])=>
+  "<div style='margin:6px 0'><b>"+k+"</b> "+naira(v)+"<div class='bar' style='width:"+Math.round(v/max*100)+"%'></div></div>").join("")||"No expenses yet.";
+ // table
+ const q=document.getElementById("search").value.toLowerCase(),fc=document.getElementById("fcat").value;
+ document.getElementById("rows").innerHTML=txns.filter(t=>(t.description.toLowerCase().includes(q))&&(!fc||t.category===fc)).map((t,i)=>
+  "<tr><td>"+t.date+"</td><td>"+t.description+"</td><td>"+naira(t.amount)+"</td><td>"+t.type+"</td><td>"+t.category+"</td><td><button onclick='del("+txns.indexOf(t)+")'>x</button></td></tr>").join("");
+ // budgets
+ document.getElementById("budgets").innerHTML=Object.entries(BUDGETS).map(([k,l])=>{const sp=s.totals[k]||0,p=Math.min(100,sp/l*100);
+  return "<div style='margin:8px 0'><b>"+k+"</b> "+naira(sp)+" / "+naira(l)+" ("+Math.round(p)+"%)<div class='prog'><div style='width:"+p+"%;background:"+(p>=85?"#E60000":"#00C853")+"'></div></div></div>"}).join("");
+ // goal
+ const gp=Math.round(goal.saved/goal.target*100);
+ document.getElementById("goalTxt").textContent=naira(goal.saved)+" / "+naira(goal.target)+" ("+gp+"%)";
+ document.getElementById("goalBar").style.width=gp+"%";
+ // forecast
+ document.getElementById("fmsg").textContent=s.daysLeft==null?"Add expenses to enable forecast.":"Your money may last approximately "+s.daysLeft+" days at "+naira(Math.round(s.avg))+"/day.";
+ const pts=[];for(let d=0;d<=20;d++)pts.push(Math.max(0,Math.round(s.bal-s.avg*d)));
+ const svg=document.getElementById("chart"),W=svg.clientWidth||900,H=160,m=Math.max(1,...pts);
+ svg.setAttribute("viewBox","0 0 "+W+" "+H);
+ svg.innerHTML="<polyline fill='none' stroke='#000' stroke-width='3' points='"+pts.map((v,i)=>(i/20*W)+","+(H-10-(v/m)*(H-30))).join(" ")+"'/>";
+ document.getElementById("ftable").innerHTML=[0,5,10,15,20].map(d=>"<span class='pill' style='margin-right:6px'>+"+d+"d: "+naira(pts[d])+"</span>").join("");
+}
+function addTxn(){const d=document.getElementById("d").value||"Expense",a=parseInt(document.getElementById("a").value)||0;
+ if(a<=0)return alert("Amount must be > 0");
+ const t=document.getElementById("t").value.toLowerCase(),c=document.getElementById("c").value||cat(d);
+ txns.push({date:document.getElementById("dt").value||"2026-09-20",description:d,amount:a,type:t,category:c});save();render()}
+function del(i){txns.splice(i,1);save();render()}
+function saveExtra(){goal.saved+=5000;render()}
+function reset(){localStorage.removeItem("cf_txns");txns=SEED.slice();goal={saved:75000,target:250000};render()}
+function ask(){const q=document.getElementById("q").value;quick(q)}
+function quick(q){const s=stats();let a;
+ if(/afford/i.test(q)){a="With "+naira(s.bal)+" and ~"+naira(Math.round(s.avg))+"/day ("+(s.daysLeft??"—")+" days left), keep a 7-day buffer before spending."}
+ else if(/most|where/i.test(q)){const top=Object.entries(s.totals).sort((a,b)=>b[1]-a[1])[0];a=top?("Most goes to "+top[0]+": "+naira(top[1])+"."):"No data yet."}
+ else{a="Your money may last ~"+(s.daysLeft??"—")+" days. Food + Transport dominate — trim those to stretch it."}
+ document.getElementById("chat").innerHTML+="<div style='margin-top:8px;border-top:2px solid #000;padding-top:8px'><b>You:</b> "+q+"<br><b>Coach:</b> "+a+"</div>";
+ document.getElementById("q").value=q}
+document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+ document.querySelectorAll("#nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");
+ document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));document.getElementById(b.dataset.t).classList.add("active")});
+document.getElementById("search").addEventListener("input",render);
+document.getElementById("fcat").addEventListener("change",render);
+document.getElementById("d").addEventListener("input",e=>{document.getElementById("c").value=cat(e.target.value)});
+const fc=document.getElementById("fcat"),cc=document.getElementById("c");
+CATS.forEach(k=>{fc.innerHTML+="<option>"+k+"</option>";cc.innerHTML+="<option>"+k+"</option>"});cc.value="Food";
+document.getElementById("csv").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;
+ const r=new FileReader();r.onload=()=>{r.result.split("\n").slice(1).forEach(l=>{const[d,desc,a,t]=l.split(",");
+  if(desc&&a){const amt=parseInt(a);if(amt>0)txns.push({date:(d||"").trim(),description:desc.trim(),amount:amt,type:(t||"expense").trim().toLowerCase(),category:cat(desc)})}});
+  save();render()};r.readAsText(f)});
+render();
+</script>
 </body>
 </html>
