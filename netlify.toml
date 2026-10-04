@@ -1,0 +1,11 @@
+# Netlify — serve the static prototype (index.html) at repo root.
+# The Streamlit app (app.py) does NOT run on Netlify; deploy that on Streamlit Cloud.
+[build]
+  publish = "."
+  command = ""
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
