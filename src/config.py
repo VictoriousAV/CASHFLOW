@@ -33,6 +33,15 @@ CATEGORY_COLORS = {
 MOCK_USER = {"name": "Daniel", "balance": 48500, "income": 70000,
              "expenses": 21500, "savings": 10000, "avg_daily": 2800, "days_left": 17}
 
+FORECAST_METHOD = "mean_7d_v1"
+
+
+def build_forecast_inputs(balance: int, avg_daily: float, window_days: int = 30) -> dict:
+    from .money import assert_int_money
+    assert_int_money(balance=int(balance))
+    return {"balance": int(balance), "avg_daily": float(avg_daily),
+            "window_days": int(window_days), "method": FORECAST_METHOD}
+
 def format_naira(amount) -> str:
     try:
         return f"₦{int(amount):,}"

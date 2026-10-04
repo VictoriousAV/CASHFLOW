@@ -1,1 +1,1 @@
-from .budgets import savings_progress  # noqa: F401
+from .budgets import savings_progress, set_goal  # noqa: F401
