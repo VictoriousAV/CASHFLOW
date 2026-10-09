@@ -1,11 +1,16 @@
 """AI Coach — grounded answers with guardrails (Phase 8).
-Uses LLM API when OPENAI_API_KEY (or compatible) is set; otherwise rule-based fallback.
-Never invents transactions; forecasts labeled estimates; not a licensed adviser.
+Provider priority: explicit OPENAI_API_KEY (+ optional OPENAI_BASE_URL) → GROQ_API_KEY.
+Groq uses its OpenAI-compatible endpoint, so the `openai` SDK is the only client.
+Without any key: rule-based fallback. Never invents transactions;
+forecasts labeled estimates; not a licensed adviser.
 """
 from __future__ import annotations
 from .forecast import forecast_message
 from .ai_context import build_context
 from .secrets import get_secret
+
+GROQ_BASE_URL = "https://api.groq.com/openai/v1"
+GROQ_DEFAULT_MODEL = "llama-3.3-70b-versatile"
 
 SYSTEM_PROMPT = (
     "You are CashFlow AI, a friendly financial decision-support assistant (not a licensed adviser). "
@@ -47,15 +52,30 @@ def _rule_based(question: str, balance: int, avg_daily: float, days_left, totals
     return forecast_message(balance, avg_daily, days_left)
 
 
+def resolve_llm_config() -> dict | None:
+    """Pick provider from env/secrets. Returns {provider, api_key, base_url, model}."""
+    openai_key = get_secret("OPENAI_API_KEY")
+    if openai_key:
+        return {"provider": "openai", "api_key": openai_key,
+                "base_url": get_secret("OPENAI_BASE_URL") or None,
+                "model": get_secret("OPENAI_MODEL", "gpt-4o-mini")}
+    groq_key = get_secret("GROQ_API_KEY")
+    if groq_key:
+        return {"provider": "groq", "api_key": groq_key,
+                "base_url": get_secret("GROQ_BASE_URL", GROQ_BASE_URL),
+                "model": get_secret("GROQ_MODEL", GROQ_DEFAULT_MODEL)}
+    return None
+
+
 def _llm_answer(question: str, context: str) -> str | None:
-    key = get_secret("OPENAI_API_KEY") or get_secret("GROQ_API_KEY")
-    if not key:
+    cfg = resolve_llm_config()
+    if not cfg:
         return None
     try:
         from openai import OpenAI
-        client = OpenAI(api_key=key, base_url=get_secret("OPENAI_BASE_URL") or None)
+        client = OpenAI(api_key=cfg["api_key"], base_url=cfg["base_url"])
         r = client.chat.completions.create(
-            model=get_secret("OPENAI_MODEL", "gpt-4o-mini"),
+            model=cfg["model"],
             messages=[{"role": "system", "content": SYSTEM_PROMPT},
                       {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {question}"}],
             max_tokens=300, temperature=0.3, timeout=20)

@@ -1,17 +1,26 @@
-"""Design tokens + constants — bright high-contrast theme with blue touch (user-approved)."""
-PRIMARY = "#00C853"
-PRIMARY_DARK = "#009624"
-SECONDARY = "#D4FF00"
-BG = "#EAF1FF"
-BG_DEEP = "#DCE7FF"
-HEADER = "#0A2FFF"
-TEXT = "#000000"
-MUTED = "#333333"
-BORDER = "#000000"
-WARNING = "#FF8F00"
-DANGER = "#E60000"
-INFO = "#0057FF"
+"""Design tokens — Complete UI color system (user-approved).
+Primary #064E3B (hover #043D2F), Secondary #52796F, Gold #D6B779,
+bg #FAF8F2, surface #FFFFFF, border #E5E1D8, text #202923, muted #68756D.
+"""
+PRIMARY = "#064E3B"
+PRIMARY_DARK = "#043D2F"
+PRIMARY_HOVER = "#043D2F"
+SECONDARY = "#52796F"
+GOLD = "#D6B779"
+BG = "#FAF8F2"
+SURFACE = "#FFFFFF"
+BORDER = "#E5E1D8"
+TEXT = "#202923"
+MUTED = "#68756D"
+BUTTON = "#064E3B"
+BUTTON_TEXT = "#FFFFFF"
+WARNING = "#B7791F"
+DANGER = "#C0392B"
+INFO = "#52796F"
 RADIUS = 16
+# Back-compat aliases
+BG_DEEP = "#F1EEE6"
+HEADER = "#064E3B"
 
 CATEGORIES = [
     "Food", "Transport", "Data & Airtime", "Education",
@@ -20,16 +29,16 @@ CATEGORIES = [
 ]
 
 CATEGORY_COLORS = {
-    "Food": "#00C853",
-    "Transport": "#0057FF",
-    "Data & Airtime": "#9D00FF",
-    "Education": "#00B8D4",
-    "Entertainment": "#FF8F00",
-    "Shopping": "#FF4081",
-    "Bills": "#333333",
-    "Savings": "#D4FF00",
-    "Health": "#E60000",
-    "Other": "#9E9E9E",
+    "Food": "#064E3B",
+    "Transport": "#52796F",
+    "Data & Airtime": "#1D6FA5",
+    "Education": "#7FB069",
+    "Entertainment": "#D6B779",
+    "Shopping": "#B7791F",
+    "Bills": "#68756D",
+    "Savings": "#2D6A4F",
+    "Health": "#C0392B",
+    "Other": "#A9B5AD",
 }
 
 MOCK_USER = {"name": "Daniel", "balance": 48500, "income": 70000,
