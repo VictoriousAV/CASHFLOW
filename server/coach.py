@@ -24,18 +24,24 @@ def model() -> str:
 
 
 def _llm_answer(question: str, context: str) -> str | None:
+    """Call OpenRouter directly over HTTP (no vendor SDK)."""
     key = api_key()
     if not key:
         return None
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=key, base_url=OPENROUTER_BASE_URL)
-        r = client.chat.completions.create(
-            model=model(),
-            messages=[{"role": "system", "content": SYSTEM_PROMPT},
-                      {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {question}"}],
-            max_tokens=300, temperature=0.3, timeout=20)
-        return (r.choices[0].message.content or "").strip() or None
+        import httpx
+        r = httpx.post(
+            f"{OPENROUTER_BASE_URL}/chat/completions",
+            headers={"Authorization": f"Bearer {key}",
+                     "Content-Type": "application/json"},
+            json={"model": model(),
+                  "messages": [{"role": "system", "content": SYSTEM_PROMPT},
+                               {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {question}"}],
+                  "max_tokens": 300, "temperature": 0.3},
+            timeout=30)
+        r.raise_for_status()
+        content = r.json()["choices"][0]["message"].get("content") or ""
+        return content.strip() or None
     except Exception:
         return None
 

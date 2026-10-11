@@ -52,6 +52,32 @@ def test_coach_uses_llm_when_available(monkeypatch):
     assert "estimate" in body["answer"].lower()
 
 
+def test_coach_calls_openrouter_over_http(monkeypatch):
+    import httpx
+
+    class FakeResp:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"choices": [{"message": {"content": "Direct OpenRouter answer"}}]}
+
+    def fake_post(url, **kwargs):
+        assert url.startswith("https://openrouter.ai/api/v1/chat/completions")
+        assert kwargs["headers"]["Authorization"].startswith("Bearer ")
+        return FakeResp()
+
+    monkeypatch.setattr(httpx, "post", fake_post)
+    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-or-test")
+    r = client.post("/api/coach", json={
+        "question": "How long will my money last?", "balance": 90000,
+        "avg_daily": 3000, "days_left": 30})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["source"] == "openrouter"
+    assert body["answer"].startswith("Direct OpenRouter answer")
+
+
 def test_coach_requires_question():
     assert client.post("/api/coach", json={"question": ""}).status_code == 422
     assert client.post("/api/coach", json={}).status_code == 422
