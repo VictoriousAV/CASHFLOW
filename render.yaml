@@ -9,3 +9,7 @@ services:
         sync: false
       - key: OPENROUTER_MODEL
         value: openai/gpt-4o-mini
+      - key: COACH_RATE_LIMIT
+        value: "2"
+      - key: COACH_RATE_WINDOW
+        value: "3600"

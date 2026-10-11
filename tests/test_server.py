@@ -1,10 +1,17 @@
 """FastAPI server tests — health, UI serving, coach contract + fallback."""
+import pytest
 from fastapi.testclient import TestClient
 
 from server import coach
 from server.main import app
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def generous_rate_limit(monkeypatch):
+    """Keep the shared per-IP limiter out of the way except in its own test."""
+    monkeypatch.setenv("COACH_RATE_LIMIT", "999")
 
 
 def test_health_reports_ai_mode(monkeypatch):
@@ -81,3 +88,17 @@ def test_coach_calls_openrouter_over_http(monkeypatch):
 def test_coach_requires_question():
     assert client.post("/api/coach", json={"question": ""}).status_code == 422
     assert client.post("/api/coach", json={}).status_code == 422
+
+
+def test_rate_limit_blocks_third_question_with_upgrade_message(monkeypatch):
+    monkeypatch.setenv("COACH_RATE_LIMIT", "2")
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    ip = {"X-Forwarded-For": "198.51.100.9"}
+    body = {"question": "How am I doing?", "balance": 50000}
+    for _ in range(2):
+        assert client.post("/api/coach", json=body, headers=ip).status_code == 200
+    r = client.post("/api/coach", json=body, headers=ip)
+    assert r.status_code == 429
+    data = r.json()
+    assert data["source"] == "rate_limited"
+    assert "Upgrade" in data["message"]
