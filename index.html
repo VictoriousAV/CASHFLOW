@@ -53,17 +53,15 @@
 <body>
 <header>
   <div class="mark">₦</div>
-  <div><b>CashFlow AI</b><br><small>Track • Know • Last <span id="modeBadge" class="pill" style="margin-left:6px">Demo mode</span></small></div>
+  <div><b>CashFlow AI</b><br><small>Track • Know • Last <span id="modeBadge" class="pill" style="margin-left:6px">Demo</span></small></div>
   <nav id="nav">
     <button data-t="dash" class="active">Dashboard</button>
     <button data-t="txns">Transactions</button>
     <button data-t="budget">Budget</button>
-    <button data-t="goals">Savings Goals</button>
-    <button data-t="forecast">Forecast</button>
+    <button data-t="goals">Savings & Forecast</button>
     <button data-t="coach">AI Coach</button>
     <button data-t="profile">Account</button>
   </nav>
-  <button class="btn ghost" id="logoutBtn" onclick="signOut()" style="padding:6px 12px">Log out</button>
 </header>
 <div id="gate" class="show">
   <div class="panel">
@@ -97,7 +95,7 @@
     <div class="grid3">
       <div class="card metric"><span>INCOME</span><div class="v" id="mInc">₦0</div><small>This month</small></div>
       <div class="card metric"><span>EXPENSES</span><div class="v" id="mExp">₦0</div><small id="mAvg">avg —</small></div>
-      <div class="card metric"><span>SAVINGS</span><div class="v">₦10,000</div><small>Tracked</small></div>
+      <div class="card metric"><span>SAVINGS</span><div class="v" id="mSav">₦0</div><small>Set aside</small></div>
     </div>
     <div class="forecast"><small><b>ESTIMATED REMAINING</b></small><div id="daysLeft" style="font-size:28px;font-weight:800">—</div><small id="forecastSub"><b>estimate, not guarantee</b></small></div>
     <div style="height:12px"></div>
@@ -117,25 +115,43 @@
     </div>
     <div class="card"><b>Add transaction</b>
       <div class="grid2">
-        <div><label>Description</label><input id="d" value="Chicken Republic"></div>
-        <div><label>Amount (₦)</label><input id="a" type="number" value="4500"></div>
+        <div><label>Description</label><input id="d" placeholder="e.g. Lunch at Mama Put"></div>
+        <div><label>Amount (₦)</label><input id="a" type="number" placeholder="0"></div>
         <div><label>Type</label><select id="t"><option>Expense</option><option>Income</option></select></div>
         <div><label>Category (auto)</label><select id="c"></select></div>
       </div>
-      <label>Date</label><input id="dt" type="date" value="2026-09-20">
+      <label>Date</label><input id="dt" type="date">
       <div style="margin-top:10px"><button class="btn" onclick="addTxn()">+ Add</button></div>
     </div>
   </section>
 
-  <section id="budget" class="tab"><div class="card"><b>Budgets (monthly)</b><div id="budgets"></div></div></section>
-
-  <section id="goals" class="tab"><div class="card"><b>Savings goal</b>
-    <div>New Laptop — <b id="goalTxt">₦75,000 / ₦250,000 (30%)</b></div>
-    <div class="prog" style="margin:10px 0"><div id="goalBar" style="width:30%"></div></div>
-    <button class="btn sec" onclick="saveExtra()">+ Add ₦5,000 savings</button>
+  <section id="budget" class="tab"><div class="card"><b>Budgets (monthly)</b>
+    <div style="color:var(--muted);font-size:13px">Your limits, tracked live against your own spending. Set, change or remove any of them.</div>
+    <div id="budgets"></div>
+    <div class="grid2" style="margin-top:10px">
+      <div><label>Category</label><select id="bcat"></select></div>
+      <div><label>Monthly limit (₦)</label><input id="bamt" type="number" placeholder="0"></div>
+    </div>
+    <div style="margin-top:10px"><button class="btn" onclick="setBudgetUI()">Set budget</button></div>
   </div></section>
 
-  <section id="forecast" class="tab"><div class="card"><b>Balance forecast (estimate only)</b>
+  <section id="goals" class="tab"><div class="card"><b>Savings goal</b>
+    <div id="goalView"></div>
+    <div class="prog" style="margin:10px 0"><div id="goalBar" style="width:0%"></div></div>
+    <div class="grid2">
+      <div><label>What are you saving for?</label><input id="gname" placeholder="e.g. New Laptop"></div>
+      <div><label>Target (₦)</label><input id="gtarget" type="number" placeholder="0"></div>
+    </div>
+    <div class="grid2">
+      <div><label>Already saved (₦)</label><input id="gsaved" type="number" placeholder="0"></div>
+      <div><label>Add savings (₦)</label><input id="gadd" type="number" placeholder="0"></div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="saveGoalUI()">Save goal</button>
+      <button class="btn sec" onclick="addSavingsUI()">+ Add savings</button>
+    </div>
+  </div>
+  <div class="card"><b>Balance forecast (estimate only)</b>
     <div id="fmsg" style="margin:8px 0;font-weight:700"></div>
     <svg id="chart" width="100%" height="160" style="border:1px solid var(--border);border-radius:12px;background:var(--surface)"></svg>
     <div id="ftable" style="margin-top:10px"></div>
@@ -152,30 +168,18 @@
 
   <section id="profile" class="tab"><div class="card"><b>Account</b>
     <div id="acctInfo" style="font-weight:700"></div>
-    <div id="profileInfo" style="margin-top:6px;color:var(--muted)">Daniel • Student • Monthly income ₦70,000 • Next allowance Oct 1</div>
+    <div id="profileInfo" style="margin-top:6px;color:var(--muted)"></div>
     <div style="margin-top:10px"><button class="btn ghost" onclick="signOut()">Log out</button></div>
-  </div>
-  <div class="card"><b>Cloud database (Supabase)</b>
-    <div style="color:var(--muted);font-size:13px">Optional. Without it the app runs in demo mode on this device only. Keys are stored only in this browser — never in the repo. See <b>docs/PRODUCTION.md</b>.</div>
-    <div class="grid2">
-      <div><label>Supabase URL</label><input id="sbUrl" placeholder="https://xyz.supabase.co"></div>
-      <div><label>Supabase anon key</label><input id="sbKey" type="password" placeholder="eyJ..."></div>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn sec" onclick="saveCloud()">Connect</button>
-      <button class="btn ghost" onclick="disconnectCloud()">Disconnect</button>
-    </div>
-    <div id="cloudMsg" style="margin-top:8px;font-weight:700"></div>
-  </div>
-  <div class="card"><b>Profile</b><div>Daniel • Student • Monthly income ₦70,000 • Next allowance Oct 1</div>
-    <div style="margin-top:8px"><button class="btn ghost" onclick="reset()">Reset demo data</button></div>
   </div></section>
 
 </div>
 <script>
 const CATS=["Food","Transport","Data & Airtime","Education","Entertainment","Shopping","Bills","Savings","Health","Other"];
-const BUDGETS={Food:20000,Transport:10000,"Data & Airtime":5000,Entertainment:5000};
-let goal={saved:75000,target:250000};
+const DEFAULT_BUDGETS={Food:20000,Transport:10000,"Data & Airtime":5000,Entertainment:5000};
+let budgets=JSON.parse(localStorage.getItem("cf_budgets")||"null")||{...DEFAULT_BUDGETS};
+let goal=JSON.parse(localStorage.getItem("cf_goal")||"null")||{name:"",target:0,saved:0};
+function saveBudgets(){localStorage.setItem("cf_budgets",JSON.stringify(budgets))}
+function saveGoal(){localStorage.setItem("cf_goal",JSON.stringify(goal))}
 const SEED=[
  {date:"2026-09-01",description:"Allowance",amount:70000,type:"income",category:"Other"},
  {date:"2026-09-03",description:"Uber",amount:2500,type:"expense",category:"Transport"},
@@ -196,10 +200,10 @@ function showGate(){document.getElementById("gate").classList.add("show")}
 function enterDemo(){hideGate();setMode()}
 function setMode(){const b=document.getElementById("modeBadge");
  const ai=document.getElementById("acctInfo");
- if(cloudReady()){b.textContent="Cloud: "+(session.user.email||"logged in");b.style.background="#064E3B";b.style.color="#fff";
-  if(ai)ai.textContent="Signed in as "+session.user.email+" — data syncs to your cloud database."}
- else{const c=cloudCfg();b.textContent=(c.url&&c.key)?"Cloud: logged out":"Demo mode";b.style.background="#D6B779";b.style.color="#064E3B";
-  if(ai)ai.textContent="Not signed in — connect Supabase in the Cloud panel below, or keep exploring demo data."}}
+ if(cloudReady()){b.textContent=session.user.email||"Synced";b.style.background="#064E3B";b.style.color="#fff";
+  if(ai)ai.textContent="Signed in as "+session.user.email+" — your data syncs across your devices."}
+ else{b.textContent="Demo";b.style.background="#D6B779";b.style.color="#064E3B";
+  if(ai)ai.textContent="Not signed in — your data stays on this device only."}}
 function cloudInit(){const c=cloudCfg();
  try{sb=(c.url&&c.key&&window.supabase)?window.supabase.createClient(c.url,c.key):null}catch(e){sb=null}
  if(!sb){setMode();showGate();return}
@@ -207,31 +211,36 @@ function cloudInit(){const c=cloudCfg();
  sb.auth.onAuthStateChange((ev,s)=>{session=s;setMode();if(s){hideGate();loadCloud()}else showGate()});}
 async function loadCloud(){if(!cloudReady())return;
  const{data,error}=await sb.from("transactions").select("*").order("date");
- if(error){cloudMsg("Load failed: "+error.message);return}
+ if(error){alert("Load failed: "+error.message);return}
  txns=data.map(t=>({id:t.id,date:t.date,description:t.description,amount:t.amount,type:t.type,category:t.category}));
- save();render();}
-function cloudMsg(m){document.getElementById("cloudMsg").textContent=m}
+ save();await loadBudgetsCloud();await loadGoalCloud();render();}
+async function loadBudgetsCloud(){const{data,error}=await sb.from("budgets").select("category,amount");
+ if(error||!data)return;
+ if(data.length){budgets={};data.forEach(b=>budgets[b.category]=b.amount)}
+ else{const rows=Object.entries(budgets).map(([category,amount])=>({user_id:session.user.id,category,amount}));
+  if(rows.length)await sb.from("budgets").upsert(rows,{onConflict:"user_id,category"})}
+ saveBudgets();}
+async function loadGoalCloud(){const{data,error}=await sb.from("goals").select("*").limit(1);
+ if(error||!data||!data.length)return;
+ goal={id:data[0].id,name:data[0].name,target:data[0].target_amount,saved:data[0].current_amount};
+ saveGoal();}
 function authMsg(m){document.getElementById("authMsg").textContent=m}
 function userName(){if(cloudReady()){
  const m=session.user.user_metadata||{};
  if(m.display_name)return m.display_name;
  const em=session.user.email||"";
  if(em.includes("@")){const p=em.split("@")[0].replace(/[._-]+/g," ");return p.charAt(0).toUpperCase()+p.slice(1)}}
- return "Daniel"}
-async function signUp(){if(!sb)return authMsg("No cloud connected yet — continue in demo mode, then add Supabase keys under Account → Cloud database.");
+ return "Friend"}
+async function signUp(){if(!sb)return authMsg("Still connecting — check your internet and retry.");
  const em=val("authEmail"),pw=document.getElementById("authPass").value,nm=val("authName");
  if(!/.+@.+\..+/.test(em))return authMsg("Enter a valid email.");
  if(pw.length<6)return authMsg("Password must be 6+ chars.");
  const{error}=await sb.auth.signUp({email:em,password:pw,options:{data:{display_name:nm||em.split("@")[0]}}});
  authMsg(error?"Sign up failed: "+error.message:"Check your email to confirm, then Log in.")}
-async function signIn(){if(!sb)return authMsg("No cloud connected yet — continue in demo mode, then add Supabase keys under Account → Cloud database.");
+async function signIn(){if(!sb)return authMsg("Still connecting — check your internet and retry.");
  const{error}=await sb.auth.signInWithPassword({email:val("authEmail"),password:document.getElementById("authPass").value});
  authMsg(error?"Login failed: "+error.message:"Logged in.");}
 async function signOut(){if(sb)await sb.auth.signOut();session=null;setMode();render();showGate();authMsg("Logged out.");}
-function saveCloud(){const u=document.getElementById("sbUrl").value.trim(),k=document.getElementById("sbKey").value.trim();
- if(!u||!k)return cloudMsg("Paste both URL and anon key.");
- localStorage.setItem("cf_sb_url",u);localStorage.setItem("cf_sb_key",k);cloudMsg("Saved — connecting…");cloudInit();}
-function disconnectCloud(){localStorage.removeItem("cf_sb_url");localStorage.removeItem("cf_sb_key");sb=null;session=null;setMode();cloudMsg("Disconnected — demo mode.")}
 function val(id){return document.getElementById(id).value.trim()}
 function save(){localStorage.setItem("cf_txns",JSON.stringify(txns))}
 function naira(n){return "₦"+Number(n||0).toLocaleString()}
@@ -247,20 +256,22 @@ function stats(){const inc=txns.filter(t=>t.type==="income").reduce((s,t)=>s+t.a
  const days=new Set(txns.filter(t=>t.type==="expense").map(t=>t.date)).size||1;
  const avg=exp/days,bal=inc-exp,daysLeft=avg>0&&bal>0?Math.floor(bal/avg):null;
  const totals={};txns.filter(t=>t.type==="expense").forEach(t=>totals[t.category]=(totals[t.category]||0)+t.amount);
- return{inc,exp,avg,bal,daysLeft,totals}}
+ const savings=txns.filter(t=>t.category==="Savings").reduce((s,t)=>s+(t.type==="income"?t.amount:-t.amount),0);
+ return{inc,exp,avg,bal,daysLeft,totals,savings}}
 function render(){const s=stats();const nm=userName();
  document.getElementById("greet").textContent="Good morning, "+nm+" 👋";
- document.getElementById("profileInfo").textContent=cloudReady()?nm+" • "+session.user.email+" • Cloud account":nm+" • Student • Monthly income ₦70,000 • Next allowance Oct 1";
- document.getElementById("balBig").textContent=naira(s.bal);
- document.getElementById("mInc").textContent=naira(s.inc);
- document.getElementById("mExp").textContent=naira(s.exp);
+  document.getElementById("profileInfo").textContent=cloudReady()?nm+" • "+session.user.email:nm+" • exploring demo on this device";
+  document.getElementById("balBig").textContent=naira(s.bal);
+  document.getElementById("mInc").textContent=naira(s.inc);
+  document.getElementById("mExp").textContent=naira(s.exp);
+  document.getElementById("mSav").textContent=naira(s.savings);
  document.getElementById("mAvg").textContent="avg "+naira(Math.round(s.avg))+"/day";
  document.getElementById("daysLeft").textContent=s.daysLeft==null?"—":"~"+s.daysLeft+" days";
  document.getElementById("forecastSub").innerHTML="<b>"+naira(s.bal)+" ÷ "+naira(Math.round(s.avg))+"/day • estimate, not guarantee</b>";
  const top=Object.entries(s.totals).sort((a,b)=>b[1]-a[1])[0];
  document.getElementById("insight").textContent=top?top[0]+" is your largest expense ("+naira(top[1])+").":"Add expenses to unlock insights.";
- const fu=(s.totals.Food||0)/BUDGETS.Food*100;
- document.getElementById("budgetPill").textContent="⚠️ "+Math.round(fu)+"% of food budget used";
+  const fu=budgets.Food?((s.totals.Food||0)/budgets.Food*100):null;
+  document.getElementById("budgetPill").textContent=fu==null?"Set a Food budget to track usage.":"⚠️ "+Math.round(fu)+"% of food budget used";
  const max=Math.max(1,...Object.values(s.totals));
   document.getElementById("catBars").innerHTML=Object.entries(s.totals).sort((a,b)=>b[1]-a[1]).map(([k,v])=>
    "<div style='margin:6px 0'><b>"+esc(k)+"</b> "+naira(v)+"<div class='bar' style='width:"+Math.round(v/max*100)+"%'></div></div>").join("")||"No expenses yet.";
@@ -269,12 +280,12 @@ function render(){const s=stats();const nm=userName();
   document.getElementById("rows").innerHTML=txns.filter(t=>(t.description.toLowerCase().includes(q))&&(!fc||t.category===fc)).map((t,i)=>
    "<tr><td>"+esc(t.date)+"</td><td>"+esc(t.description)+"</td><td>"+naira(t.amount)+"</td><td>"+esc(t.type)+"</td><td>"+esc(t.category)+"</td><td><button class='del' onclick='del("+txns.indexOf(t)+")'>Delete</button></td></tr>").join("");
  // budgets
- document.getElementById("budgets").innerHTML=Object.entries(BUDGETS).map(([k,l])=>{const sp=s.totals[k]||0,p=Math.min(100,sp/l*100);
-  return "<div style='margin:8px 0'><b>"+k+"</b> "+naira(sp)+" / "+naira(l)+" ("+Math.round(p)+"%)<div class='prog'><div style='width:"+p+"%;background:"+(p>=85?"#C0392B":"#064E3B")+"'></div></div></div>"}).join("");
+ document.getElementById("budgets").innerHTML=Object.entries(budgets).map(([k,l])=>{const sp=s.totals[k]||0,p=l>0?Math.min(100,sp/l*100):0;
+  return "<div style='margin:8px 0'><b>"+esc(k)+"</b> "+naira(sp)+" / "+naira(l)+" ("+Math.round(p)+"%) <button class='del' onclick='delBudget(\""+esc(k)+"\")'>Remove</button><div class='prog'><div style='width:"+p+"%;background:"+(p>=85?"#C0392B":"#064E3B")+"'></div></div></div>"}).join("")||"No budgets yet — set your first limit below.";
  // goal
- const gp=Math.round(goal.saved/goal.target*100);
- document.getElementById("goalTxt").textContent=naira(goal.saved)+" / "+naira(goal.target)+" ("+gp+"%)";
- document.getElementById("goalBar").style.width=gp+"%";
+ const gp=goal.target>0?Math.round(goal.saved/goal.target*100):0;
+ document.getElementById("goalView").innerHTML=goal.target>0?esc(goal.name||"Savings goal")+" — <b>"+naira(goal.saved)+" / "+naira(goal.target)+" ("+gp+"%)</b>":"No savings goal yet — create one below.";
+ document.getElementById("goalBar").style.width=Math.min(100,gp)+"%";
  // forecast
  document.getElementById("fmsg").textContent=s.daysLeft==null?"Add expenses to enable forecast.":"Your money may last approximately "+s.daysLeft+" days at "+naira(Math.round(s.avg))+"/day.";
  const pts=[];for(let d=0;d<=20;d++)pts.push(Math.max(0,Math.round(s.bal-s.avg*d)));
@@ -283,8 +294,8 @@ function render(){const s=stats();const nm=userName();
   svg.innerHTML="<polyline fill='none' stroke='#064E3B' stroke-width='3' points='"+pts.map((v,i)=>(i/20*W)+","+(H-10-(v/m)*(H-30))).join(" ")+"'/>";
  document.getElementById("ftable").innerHTML=[0,5,10,15,20].map(d=>"<span class='pill' style='margin-right:6px'>+"+d+"d: "+naira(pts[d])+"</span>").join("");
 }
-async function addTxn(){const d=document.getElementById("d").value.trim()||"Expense",a=parseInt(document.getElementById("a").value)||0;
- if(!d)return alert("Description required.");
+async function addTxn(){const d=document.getElementById("d").value.trim(),a=parseInt(document.getElementById("a").value)||0;
+ if(!d)return alert("Describe the transaction first.");
  if(!(a>0))return alert("Amount must be > 0.");
  const dt=document.getElementById("dt").value||new Date().toISOString().slice(0,10);
  if(dt>new Date().toISOString().slice(0,10))return alert("Date cannot be in the future.");
@@ -299,8 +310,30 @@ async function del(i){const t=txns[i];
  if(cloudReady()&&t.id){const{error}=await sb.from("transactions").delete().eq("id",t.id);
   if(error)return alert("Delete failed: "+error.message)}
  txns.splice(i,1);save();render()}
-function saveExtra(){goal.saved+=5000;render()}
-function reset(){localStorage.removeItem("cf_txns");txns=SEED.slice();goal={saved:75000,target:250000};render()}
+async function setBudgetUI(){const k=document.getElementById("bcat").value,a=parseInt(document.getElementById("bamt").value)||0;
+ if(!(a>0))return alert("Enter a limit above ₦0.");
+ budgets[k]=a;saveBudgets();
+ if(cloudReady()){const{error}=await sb.from("budgets").upsert({user_id:session.user.id,category:k,amount:a},{onConflict:"user_id,category"});
+  if(error)return alert("Save failed: "+error.message)}
+ document.getElementById("bamt").value="";render()}
+async function delBudget(k){delete budgets[k];saveBudgets();
+ if(cloudReady())await sb.from("budgets").delete().eq("user_id",session.user.id).eq("category",k);
+ render()}
+async function saveGoalUI(){const n=val("gname"),t=parseInt(document.getElementById("gtarget").value)||0,sv=parseInt(document.getElementById("gsaved").value)||0;
+ if(!n)return alert("Name what you're saving for.");
+ if(!(t>0))return alert("Enter a target above ₦0.");
+ goal={id:goal.id,name:n.slice(0,80),target:t,saved:Math.max(0,sv)};saveGoal();
+ if(cloudReady()){
+  await sb.from("goals").delete().eq("user_id",session.user.id);
+  const{data,error}=await sb.from("goals").insert({user_id:session.user.id,name:goal.name,target_amount:t,current_amount:goal.saved}).select().single();
+  if(error)return alert("Save failed: "+error.message);
+  goal.id=data.id;saveGoal()}
+ render()}
+async function addSavingsUI(){const a=parseInt(document.getElementById("gadd").value)||0;
+ if(!(a>0))return alert("Enter an amount above ₦0.");
+ goal.saved+=a;saveGoal();
+ if(cloudReady()&&goal.id)await sb.from("goals").update({current_amount:goal.saved}).eq("id",goal.id);
+ document.getElementById("gadd").value="";render()}
 function ask(){const q=document.getElementById("q").value;quick(q)}
 function quick(q){const s=stats();let a;
  if(/afford/i.test(q)){a="With "+naira(s.bal)+" and ~"+naira(Math.round(s.avg))+"/day ("+(s.daysLeft??"—")+" days left), keep a 7-day buffer before spending."}
@@ -314,8 +347,8 @@ document.getElementById("nav").addEventListener("click",e=>{const b=e.target.clo
 document.getElementById("search").addEventListener("input",render);
 document.getElementById("fcat").addEventListener("change",render);
 document.getElementById("d").addEventListener("input",e=>{document.getElementById("c").value=cat(e.target.value)});
-const fc=document.getElementById("fcat"),cc=document.getElementById("c");
-CATS.forEach(k=>{fc.innerHTML+="<option>"+k+"</option>";cc.innerHTML+="<option>"+k+"</option>"});cc.value="Food";
+const fc=document.getElementById("fcat"),cc=document.getElementById("c"),bc=document.getElementById("bcat");
+CATS.forEach(k=>{fc.innerHTML+="<option>"+k+"</option>";cc.innerHTML+="<option>"+k+"</option>";bc.innerHTML+="<option>"+k+"</option>"});cc.value="Other";
 document.getElementById("csv").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;
  if(f.size>2*1024*1024)return alert("CSV too large (2MB limit).");
  const r=new FileReader();r.onload=async()=>{const rows=[];
@@ -327,8 +360,7 @@ document.getElementById("csv").addEventListener("change",async e=>{const f=e.tar
    txns=data.map(t=>({id:t.id,date:t.date,description:t.description,amount:t.amount,type:t.type,category:t.category}));}
   else txns=txns.concat(rows);
   save();render()};r.readAsText(f)});
-document.getElementById("sbUrl").value=cloudCfg().url;
-document.getElementById("sbKey").value=localStorage.getItem("cf_sb_key")||"";
+document.getElementById("dt").value=new Date().toISOString().slice(0,10);
 window.addEventListener("load",cloudInit);cloudInit();
 render();
 </script>
