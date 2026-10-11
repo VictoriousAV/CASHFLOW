@@ -186,7 +186,7 @@ const SEED=[
 let txns=JSON.parse(localStorage.getItem("cf_txns")||"null")||SEED.slice();
 function esc(s){return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
 /* ---- Cloud (Supabase Auth + Postgres). Demo mode when signed out. ---- */
-const SB_DEFAULT_URL="https://pkhxhzpgfoitkfszzdi.supabase.co";
+const SB_DEFAULT_URL="https://pkhxhzpgfoitlkfszzdi.supabase.co";
 const SB_DEFAULT_KEY="sb_publishable_GerveDQ5vq2hsbiAA0PIOA_66xSiebU";
 let sb=null, session=null;
 function cloudCfg(){return{url:(localStorage.getItem("cf_sb_url")||SB_DEFAULT_URL).trim(),key:(localStorage.getItem("cf_sb_key")||SB_DEFAULT_KEY).trim()}}
