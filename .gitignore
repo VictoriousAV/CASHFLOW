@@ -4,3 +4,12 @@ data/cashflow.db
 .streamlit/secrets.toml
 .env
 .venv/
+
+# Android
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/keystore/
+android/keystore.properties
+dist/*.apk

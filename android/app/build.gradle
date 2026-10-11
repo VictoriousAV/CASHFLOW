@@ -1,0 +1,52 @@
+plugins {
+    id 'com.android.application'
+}
+
+def ktFile = file('../keystore.properties')
+if (!ktFile.exists()) {
+    throw new GradleException("Missing android/keystore.properties — run build_apk.bat from the repo root to generate the release keystore.")
+}
+def ktProps = new Properties()
+ktProps.load(new FileInputStream(ktFile))
+
+android {
+    namespace 'com.victoriousav.cashflowai'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.victoriousav.cashflowai"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(ktProps['storeFile'])
+            storePassword ktProps['storePassword']
+            keyAlias ktProps['keyAlias']
+            keyPassword ktProps['keyPassword']
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.release
+        }
+        debug {
+            applicationIdSuffix ".debug"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+}
