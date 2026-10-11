@@ -42,6 +42,12 @@
   td .del{background:var(--surface);color:var(--danger);border:1px solid var(--border);border-radius:8px;font-weight:800;cursor:pointer;padding:4px 10px}
   td .del:hover{border-color:var(--danger)}
   .tok{border:1px solid var(--border);border-radius:8px;padding:6px 10px;background:var(--surface)}
+  #gate{position:fixed;inset:0;background:var(--primary);display:none;place-items:center;z-index:50;padding:20px}
+  #gate.show{display:grid}
+  #gate .panel{background:var(--surface);border-radius:20px;padding:28px;max-width:420px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+  #gate .panel h1{margin:0 0 4px;font-size:26px}
+  #gate .panel p{color:var(--muted);font-size:14px;margin:0 0 12px}
+  #gate .demo{background:none;border:none;color:var(--secondary);font-weight:800;cursor:pointer;margin-top:12px;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -57,11 +63,28 @@
     <button data-t="coach">AI Coach</button>
     <button data-t="profile">Account</button>
   </nav>
+  <button class="btn ghost" id="logoutBtn" onclick="signOut()" style="padding:6px 12px">Log out</button>
 </header>
+<div id="gate" class="show">
+  <div class="panel">
+    <div class="mark" style="border-color:var(--primary)">₦</div>
+    <h1>CashFlow AI</h1>
+    <p>Know where your money goes. Know how long it will last. Sign in to sync across devices, or explore the demo.</p>
+    <div><label>Name (shown in the app)</label><input id="authName" type="text" placeholder="e.g. Adaeze" autocomplete="given-name"></div>
+    <div><label>Email</label><input id="authEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
+    <div><label>Password (min 6 chars)</label><input id="authPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="signUp()">Sign up</button>
+      <button class="btn sec" onclick="signIn()">Log in</button>
+    </div>
+    <div id="authMsg" style="margin-top:8px;font-weight:700"></div>
+    <button class="demo" onclick="enterDemo()">Continue in demo mode →</button>
+  </div>
+</div>
 <div class="wrap">
 
   <section id="dash" class="tab active">
-    <div class="card"><h2 style="margin:0">Good morning, Daniel 👋</h2><div id="balBig" style="font-size:36px;font-weight:800">₦0</div>
+    <div class="card"><h2 id="greet" style="margin:0">Good morning, Daniel 👋</h2><div id="balBig" style="font-size:36px;font-weight:800">₦0</div>
       <div class="tokens" style="margin-top:8px">
         <span class="tok" style="background:#064E3B;color:#fff">#064E3B primary</span>
         <span class="tok" style="background:#52796F;color:#fff">#52796F secondary</span>
@@ -127,19 +150,10 @@
     </div>
   </div></section>
 
-  <section id="profile" class="tab"><div class="card"><b>Account — sign up / login</b>
-    <div id="authBox">
-      <div class="grid2">
-        <div><label>Email</label><input id="authEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
-        <div><label>Password (min 6 chars)</label><input id="authPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
-      </div>
-      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn" onclick="signUp()">Sign up</button>
-        <button class="btn sec" onclick="signIn()">Log in</button>
-        <button class="btn ghost" onclick="signOut()">Log out</button>
-      </div>
-      <div id="authMsg" style="margin-top:8px;font-weight:700"></div>
-    </div>
+  <section id="profile" class="tab"><div class="card"><b>Account</b>
+    <div id="acctInfo" style="font-weight:700"></div>
+    <div id="profileInfo" style="margin-top:6px;color:var(--muted)">Daniel • Student • Monthly income ₦70,000 • Next allowance Oct 1</div>
+    <div style="margin-top:10px"><button class="btn ghost" onclick="signOut()">Log out</button></div>
   </div>
   <div class="card"><b>Cloud database (Supabase)</b>
     <div style="color:var(--muted);font-size:13px">Optional. Without it the app runs in demo mode on this device only. Keys are stored only in this browser — never in the repo. See <b>docs/PRODUCTION.md</b>.</div>
@@ -171,18 +185,26 @@ const SEED=[
  {date:"2026-09-08",description:"Bolt Trip",amount:3000,type:"expense",category:"Transport"}];
 let txns=JSON.parse(localStorage.getItem("cf_txns")||"null")||SEED.slice();
 function esc(s){return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
-/* ---- Cloud (Supabase Auth + Postgres). Demo mode when unconfigured. ---- */
+/* ---- Cloud (Supabase Auth + Postgres). Demo mode when signed out. ---- */
+const SB_DEFAULT_URL="https://pkhxhzpgfoitkfszzdi.supabase.co";
+const SB_DEFAULT_KEY="sb_publishable_GerveDQ5vq2hsbiAA0PIOA_66xSiebU";
 let sb=null, session=null;
-function cloudCfg(){return{url:(localStorage.getItem("cf_sb_url")||"").trim(),key:(localStorage.getItem("cf_sb_key")||"").trim()}}
+function cloudCfg(){return{url:(localStorage.getItem("cf_sb_url")||SB_DEFAULT_URL).trim(),key:(localStorage.getItem("cf_sb_key")||SB_DEFAULT_KEY).trim()}}
 function cloudReady(){return!!(sb&&session)}
+function hideGate(){document.getElementById("gate").classList.remove("show")}
+function showGate(){document.getElementById("gate").classList.add("show")}
+function enterDemo(){hideGate();setMode()}
 function setMode(){const b=document.getElementById("modeBadge");
- if(cloudReady()){b.textContent="Cloud: "+(session.user.email||"logged in");b.style.background="#064E3B";b.style.color="#fff"}
- else{const c=cloudCfg();b.textContent=(c.url&&c.key)?"Cloud: logged out":"Demo mode";b.style.background="#D6B779";b.style.color="#064E3B"}}
+ const ai=document.getElementById("acctInfo");
+ if(cloudReady()){b.textContent="Cloud: "+(session.user.email||"logged in");b.style.background="#064E3B";b.style.color="#fff";
+  if(ai)ai.textContent="Signed in as "+session.user.email+" — data syncs to your cloud database."}
+ else{const c=cloudCfg();b.textContent=(c.url&&c.key)?"Cloud: logged out":"Demo mode";b.style.background="#D6B779";b.style.color="#064E3B";
+  if(ai)ai.textContent="Not signed in — connect Supabase in the Cloud panel below, or keep exploring demo data."}}
 function cloudInit(){const c=cloudCfg();
  try{sb=(c.url&&c.key&&window.supabase)?window.supabase.createClient(c.url,c.key):null}catch(e){sb=null}
- if(!sb){setMode();return}
- sb.auth.getSession().then(r=>{session=r.data.session;setMode();if(session)loadCloud()});
- sb.auth.onAuthStateChange((ev,s)=>{session=s;setMode();if(s)loadCloud()});}
+ if(!sb){setMode();showGate();return}
+ sb.auth.getSession().then(r=>{session=r.data.session;setMode();if(session){hideGate();loadCloud()}else showGate()});
+ sb.auth.onAuthStateChange((ev,s)=>{session=s;setMode();if(s){hideGate();loadCloud()}else showGate()});}
 async function loadCloud(){if(!cloudReady())return;
  const{data,error}=await sb.from("transactions").select("*").order("date");
  if(error){cloudMsg("Load failed: "+error.message);return}
@@ -190,16 +212,22 @@ async function loadCloud(){if(!cloudReady())return;
  save();render();}
 function cloudMsg(m){document.getElementById("cloudMsg").textContent=m}
 function authMsg(m){document.getElementById("authMsg").textContent=m}
-async function signUp(){if(!sb)return authMsg("Connect Supabase first (below).");
- const em=val("authEmail"),pw=document.getElementById("authPass").value;
+function userName(){if(cloudReady()){
+ const m=session.user.user_metadata||{};
+ if(m.display_name)return m.display_name;
+ const em=session.user.email||"";
+ if(em.includes("@")){const p=em.split("@")[0].replace(/[._-]+/g," ");return p.charAt(0).toUpperCase()+p.slice(1)}}
+ return "Daniel"}
+async function signUp(){if(!sb)return authMsg("No cloud connected yet — continue in demo mode, then add Supabase keys under Account → Cloud database.");
+ const em=val("authEmail"),pw=document.getElementById("authPass").value,nm=val("authName");
  if(!/.+@.+\..+/.test(em))return authMsg("Enter a valid email.");
  if(pw.length<6)return authMsg("Password must be 6+ chars.");
- const{error}=await sb.auth.signUp({email:em,password:pw});
+ const{error}=await sb.auth.signUp({email:em,password:pw,options:{data:{display_name:nm||em.split("@")[0]}}});
  authMsg(error?"Sign up failed: "+error.message:"Check your email to confirm, then Log in.")}
-async function signIn(){if(!sb)return authMsg("Connect Supabase first (below).");
+async function signIn(){if(!sb)return authMsg("No cloud connected yet — continue in demo mode, then add Supabase keys under Account → Cloud database.");
  const{error}=await sb.auth.signInWithPassword({email:val("authEmail"),password:document.getElementById("authPass").value});
  authMsg(error?"Login failed: "+error.message:"Logged in.");}
-async function signOut(){if(sb)await sb.auth.signOut();session=null;setMode();authMsg("Logged out — demo mode.");}
+async function signOut(){if(sb)await sb.auth.signOut();session=null;setMode();render();showGate();authMsg("Logged out.");}
 function saveCloud(){const u=document.getElementById("sbUrl").value.trim(),k=document.getElementById("sbKey").value.trim();
  if(!u||!k)return cloudMsg("Paste both URL and anon key.");
  localStorage.setItem("cf_sb_url",u);localStorage.setItem("cf_sb_key",k);cloudMsg("Saved — connecting…");cloudInit();}
@@ -220,7 +248,9 @@ function stats(){const inc=txns.filter(t=>t.type==="income").reduce((s,t)=>s+t.a
  const avg=exp/days,bal=inc-exp,daysLeft=avg>0&&bal>0?Math.floor(bal/avg):null;
  const totals={};txns.filter(t=>t.type==="expense").forEach(t=>totals[t.category]=(totals[t.category]||0)+t.amount);
  return{inc,exp,avg,bal,daysLeft,totals}}
-function render(){const s=stats();
+function render(){const s=stats();const nm=userName();
+ document.getElementById("greet").textContent="Good morning, "+nm+" 👋";
+ document.getElementById("profileInfo").textContent=cloudReady()?nm+" • "+session.user.email+" • Cloud account":nm+" • Student • Monthly income ₦70,000 • Next allowance Oct 1";
  document.getElementById("balBig").textContent=naira(s.bal);
  document.getElementById("mInc").textContent=naira(s.inc);
  document.getElementById("mExp").textContent=naira(s.exp);
@@ -297,7 +327,7 @@ document.getElementById("csv").addEventListener("change",async e=>{const f=e.tar
    txns=data.map(t=>({id:t.id,date:t.date,description:t.description,amount:t.amount,type:t.type,category:t.category}));}
   else txns=txns.concat(rows);
   save();render()};r.readAsText(f)});
-document.getElementById("sbUrl").value=localStorage.getItem("cf_sb_url")||"";
+document.getElementById("sbUrl").value=cloudCfg().url;
 document.getElementById("sbKey").value=localStorage.getItem("cf_sb_key")||"";
 window.addEventListener("load",cloudInit);cloudInit();
 render();
