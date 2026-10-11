@@ -90,6 +90,34 @@ def test_coach_requires_question():
     assert client.post("/api/coach", json={}).status_code == 422
 
 
+def test_pwa_manifest_served():
+    r = client.get("/manifest.json")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["display"] == "standalone"
+    assert body["start_url"] == "/"
+    assert len(body["icons"]) >= 3
+
+
+def test_pwa_service_worker_served():
+    r = client.get("/sw.js")
+    assert r.status_code == 200
+    assert "addEventListener('install'" in r.text
+    assert "caches.open" in r.text
+
+
+def test_pwa_icons_served():
+    r = client.get("/icons/icon-192.png")
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("image/png")
+
+
+def test_index_links_pwa_assets():
+    r = client.get("/")
+    assert 'rel="manifest"' in r.text
+    assert "navigator.serviceWorker.register('/sw.js')" in r.text
+
+
 def test_rate_limit_blocks_third_question_with_upgrade_message(monkeypatch):
     monkeypatch.setenv("COACH_RATE_LIMIT", "2")
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)

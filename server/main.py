@@ -13,6 +13,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 try:
@@ -96,3 +97,16 @@ def ask(req: CoachRequest, request: Request):
 @app.get("/")
 def index() -> FileResponse:
     return FileResponse(ROOT / "index.html")
+
+
+@app.get("/manifest.json")
+def manifest() -> FileResponse:
+    return FileResponse(ROOT / "manifest.json", media_type="application/manifest+json")
+
+
+@app.get("/sw.js")
+def service_worker() -> FileResponse:
+    return FileResponse(ROOT / "sw.js", media_type="text/javascript")
+
+
+app.mount("/icons", StaticFiles(directory=ROOT / "icons"), name="icons")
